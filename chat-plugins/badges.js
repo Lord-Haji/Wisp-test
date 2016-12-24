@@ -29,15 +29,15 @@ exports.commands = {
 			userBadges = userBadges.filter(b => b !== selectedBadge);
 			userBadges.push(selectedBadge);
 			Db('userBadges').set(toId(userid), userBadges);
-			if (Users.get(targetUser)) Users.get(userid).popup('|modal||html|<font color="red"><strong>ATTENTION!</strong></font><br /> You have received a badge from <b><font color="' + Wisp.hashColor(toId(user)) + '">' + Tools.escapeHTML(user.name) + '</font></b>: <img src="' + Db('badgeData').get(selectedBadge)[1] + '" width="16" height="16">');
+			if (Users.get(targetUser)) Users.get(userid).popup('|modal||html|<font color="red"><strong>ATTENTION!</strong></font><br /> You have received a badge from <b><font color="' + Wisp.hashColor(toId(user)) + '">' + Chat.escapeHTML(user.name) + '</font></b>: <img src="' + Db('badgeData').get(selectedBadge)[1] + '" width="16" height="16">');
 			this.logModCommand(user.name + " gave the badge '" + selectedBadge + "' badge to " + userid + ".");
 			this.sendReply("The '" + selectedBadge + "' badge was given to '" + userid + "'.");
 			break;
 		case 'create':
 			if (!this.can('ban')) return false;
 			if (parts.length !== 4) return this.errorReply("Correct command: `/badges create, badge name, description, image`.");
-			let badgeName = Tools.escapeHTML(parts[1].trim());
-			let description = Tools.escapeHTML(parts[2].trim());
+			let badgeName = Chat.escapeHTML(parts[1].trim());
+			let description = Chat.escapeHTML(parts[2].trim());
 			let img = parts[3].trim();
 			if (Db('badgeData').has(badgeName)) return this.errorReply('This badge already exists.');
 			Db('badgeData').set(badgeName, [description, img]);

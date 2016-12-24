@@ -26,13 +26,13 @@ github.on('push', function push(repo, ref, result) {
 	let branch = /[^/]+$/.exec(ref)[0];
 	let messages = [];
 	let message = "";
-	message += "[<font color='FF00FF'>" + Tools.escapeHTML(repo) + '</font>] ';
-	message += "<font color='909090'>" + Tools.escapeHTML(result.pusher.name) + "</font> ";
+	message += "[<font color='FF00FF'>" + Chat.escapeHTML(repo) + '</font>] ';
+	message += "<font color='909090'>" + Chat.escapeHTML(result.pusher.name) + "</font> ";
 	message += (result.forced ? '<font color="red">force-pushed</font>' : 'pushed') + " ";
-	message += "<b>" + Tools.escapeHTML(result.commits.length) + "</b> ";
+	message += "<b>" + Chat.escapeHTML(result.commits.length) + "</b> ";
 	message += "new commit" + (result.commits.length === 1 ? '' : 's') + " to ";
-	message += "<font color='800080'>" + Tools.escapeHTML(branch) + "</font>: ";
-	message += "<a href=\"" + Tools.escapeHTML(url) + "\">View &amp; compare</a>";
+	message += "<font color='800080'>" + Chat.escapeHTML(branch) + "</font>: ";
+	message += "<a href=\"" + Chat.escapeHTML(url) + "\">View &amp; compare</a>";
 	messages.push(message);
 	result.commits.forEach(function (commit) {
 		let commitMessage = commit.message;
@@ -41,11 +41,11 @@ github.on('push', function push(repo, ref, result) {
 			shortCommit += '...';
 		}
 		message = "";
-		message += "<font color='FF00FF'>" + Tools.escapeHTML(repo) + "</font>/";
-		message += "<font color='800080'>" + Tools.escapeHTML(branch) + "</font> ";
-		message += "<a href=\"" + Tools.escapeHTML(commit.url) + "\">";
-		message += "<font color='606060'>" + Tools.escapeHTML(commit.id.substring(0, 6)) + "</font></a> ";
-		message += "<font color='909090'>" + Tools.escapeHTML(commit.author.name) + "</font>: " + Tools.escapeHTML(shortCommit);
+		message += "<font color='FF00FF'>" + Chat.escapeHTML(repo) + "</font>/";
+		message += "<font color='800080'>" + Chat.escapeHTML(branch) + "</font> ";
+		message += "<a href=\"" + Chat.escapeHTML(commit.url) + "\">";
+		message += "<font color='606060'>" + Chat.escapeHTML(commit.id.substring(0, 6)) + "</font></a> ";
+		message += "<font color='909090'>" + Chat.escapeHTML(commit.author.name) + "</font>: " + Chat.escapeHTML(shortCommit);
 		messages.push(message);
 	});
 	sendMessages(messages.join("<br>"));

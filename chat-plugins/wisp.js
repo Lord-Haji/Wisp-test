@@ -269,7 +269,7 @@ exports.commands = {
 		}
 
 		let tell = Wisp.tells[id][user.userid];
-		let msg = '<span style = "color:gray;"><i>(Sent by ' + user.name + ' on ' + moment().format("ddd, MMMM DD, YYYY HH:mmA ZZ") + ')</i></span><br><b><span style = "color:' + Wisp.hashColor(user.userid) + '">' + user.name + ':</span></b> ' + Tools.escapeHTML(target);
+		let msg = '<span style = "color:gray;"><i>(Sent by ' + user.name + ' on ' + moment().format("ddd, MMMM DD, YYYY HH:mmA ZZ") + ')</i></span><br><b><span style = "color:' + Wisp.hashColor(user.userid) + '">' + user.name + ':</span></b> ' + Chat.escapeHTML(target);
 		if (tell) {
 			Wisp.tells[id][user.userid].push(msg);
 		} else {
@@ -303,7 +303,7 @@ exports.commands = {
 				data += chunk;
 			}).on('end', () => {
 				if (data.charAt(0) !== '[') {
-					this.sendReplyBox("Error retrieving definition for <b>" + Tools.escapeHTML(target) + "</b>.");
+					this.sendReplyBox("Error retrieving definition for <b>" + Chat.escapeHTML(target) + "</b>.");
 					if (room) room.update();
 					return;
 				}
@@ -317,7 +317,7 @@ exports.commands = {
 					let count = 1;
 					for (let u in data) {
 						if (count > 3) break;
-						output += '(<b>' + count + '</b>) ' + Tools.escapeHTML(data[u]['text']) + '<br />';
+						output += '(<b>' + count + '</b>) ' + Chat.escapeHTML(data[u]['text']) + '<br />';
 						count++;
 					}
 					this.sendReplyBox(output);
@@ -349,23 +349,23 @@ exports.commands = {
 				data += chunk;
 			}).on('end', () => {
 				if (data.charAt(0) !== '{') {
-					this.sendReplyBox("Error retrieving definition for <b>" + Tools.escapeHTML(target) + "</b>.");
+					this.sendReplyBox("Error retrieving definition for <b>" + Chat.escapeHTML(target) + "</b>.");
 					if (room) room.update();
 					return;
 				}
 				data = JSON.parse(data);
 				let definitions = data['list'];
 				if (data['result_type'] === 'no_results') {
-					this.sendReplyBox('No results for <b>"' + Tools.escapeHTML(target) + '"</b>.');
+					this.sendReplyBox('No results for <b>"' + Chat.escapeHTML(target) + '"</b>.');
 					if (room) room.update();
 					return;
 				} else {
 					if (!definitions[0]['word'] || !definitions[0]['definition']) {
-						self.sendReplyBox('No results for <b>"' + Tools.escapeHTML(target) + '"</b>.');
+						self.sendReplyBox('No results for <b>"' + Chat.escapeHTML(target) + '"</b>.');
 						if (room) room.update();
 						return;
 					}
-					let output = '<b>' + Tools.escapeHTML(definitions[0]['word']) + ':</b> ' + Tools.escapeHTML(definitions[0]['definition']).replace(/\r\n/g, '<br />').replace(/\n/g, ' ');
+					let output = '<b>' + Chat.escapeHTML(definitions[0]['word']) + ':</b> ' + Chat.escapeHTML(definitions[0]['definition']).replace(/\r\n/g, '<br />').replace(/\n/g, ' ');
 					if (output.length > 400) output = output.slice(0, 400) + '...';
 					this.sendReplyBox(output);
 					if (room) room.update();
@@ -419,7 +419,7 @@ exports.commands = {
 			let message = '|pm|' + pmName + '|' + room.users[i].getIdentity() + '| ' + target;
 			room.users[i].send(message);
 		}
-		this.privateModCommand('(' + Tools.escapeHTML(user.name) + ' mass PMd: ' + target + ')');
+		this.privateModCommand('(' + Chat.escapeHTML(user.name) + ' mass PMd: ' + target + ')');
 	},
 	rmallhelp: ["/rmall [message] - Sends a PM to every user in a room."],
 
@@ -461,7 +461,7 @@ exports.commands = {
 			targetUser.send("|nametaken||Your name conflicts with " + user.name + (user.name.substr(-1) === "s" ? "'" : "'s") + " new away status.");
 		}
 
-		if (user.can('mute', null, room)) this.add("|raw|-- <font color='" + Wisp.hashColor(user.userid) + "'><strong>" + Tools.escapeHTML(user.name) + "</strong></font> is now " + target.toLowerCase() + ".");
+		if (user.can('mute', null, room)) this.add("|raw|-- <font color='" + Wisp.hashColor(user.userid) + "'><strong>" + Chat.escapeHTML(user.name) + "</strong></font> is now " + target.toLowerCase() + ".");
 		if (user.can('lock')) this.parse('/hide');
 		user.forceRename(newName, user.registered);
 		user.updateIdentity();
@@ -477,7 +477,7 @@ exports.commands = {
 		let statusIdx = newName.search(/\s\-\s[\u24B6-\u24E9\u2460-\u2468\u24EA]+$/);
 		if (statusIdx < 0) {
 			user.isAway = false;
-			if (user.can('mute', null, room)) this.add("|raw|-- <font color='" + Wisp.hashColor(user.userid) + "'><strong>" + Tools.escapeHTML(user.name) + "</strong></font> is no longer away.");
+			if (user.can('mute', null, room)) this.add("|raw|-- <font color='" + Wisp.hashColor(user.userid) + "'><strong>" + Chat.escapeHTML(user.name) + "</strong></font> is no longer away.");
 			return false;
 		}
 
@@ -486,7 +486,7 @@ exports.commands = {
 		user.forceRename(newName, user.registered);
 		user.updateIdentity();
 		user.isAway = false;
-		if (user.can('mute', null, room)) this.add("|raw|-- <font color='" + Wisp.hashColor(user.userid) + "'><strong>" + Tools.escapeHTML(newName) + "</strong></font> is no longer " + status.toLowerCase() + ".");
+		if (user.can('mute', null, room)) this.add("|raw|-- <font color='" + Wisp.hashColor(user.userid) + "'><strong>" + Chat.escapeHTML(newName) + "</strong></font> is no longer " + status.toLowerCase() + ".");
 		if (user.can('lock')) this.parse('/show');
 	},
 	backhelp: ["/back - Sets a users away status back to normal."],
@@ -638,7 +638,7 @@ exports.commands = {
 	anime: function (target, room, user) {
 		if (!this.runBroadcast()) return;
 		if (!target) return this.errorReply("No target.");
-		let targetAnime = Tools.escapeHTML(target.trim());
+		let targetAnime = Chat.escapeHTML(target.trim());
 		let id = targetAnime.toLowerCase().replace(/ /g, '');
 		if (amCache.anime[id]) return this.sendReply('|raw|' + amCache.anime[id]);
 
@@ -679,7 +679,7 @@ exports.commands = {
 	manga: function (target, room, user) {
 		if (!this.runBroadcast()) return;
 		if (!target) return this.errorReply("No target.");
-		let targetAnime = Tools.escapeHTML(target.trim());
+		let targetAnime = Chat.escapeHTML(target.trim());
 		let id = targetAnime.toLowerCase().replace(/ /g, '');
 		if (amCache.anime[id]) return this.sendReply('|raw|' + amCache.anime[id]);
 
@@ -717,7 +717,7 @@ exports.commands = {
 	fcadd: 'friendcodeadd',
 	friendcodeadd: function (target, room, user) {
 		if (!target) return this.errorReply("Invalid command. Valid commands are `/friendcodeadd code` and `/friendcoderemove`.");
-		let fc = Tools.escapeHTML(target.trim());
+		let fc = Chat.escapeHTML(target.trim());
 		let reg = /^\d{4}-\d{4}-\d{4}$/;
 		if (!reg.test(fc)) return this.errorReply("Invalid friend code, example: 3110-7818-5106");
 		Db('friendcodes').set(toId(user), fc);
@@ -783,7 +783,7 @@ exports.commands = {
 			if (title.length < 1) return this.errorReply("Title must be at least one character long.");
 			if (title.length > 25) return this.errorReply("Titles may not be longer than 25 characters.");
 			if (hex && hex.length > 7) return this.errorReply("The hex may not be longer than 7 characters (including #).");
-			title = '<font color="#' + ((hex && hex.length > 1) ? toId(hex) : 'b30000') + '"><b>' + Tools.escapeHTML(title) + '</b></font>';
+			title = '<font color="#' + ((hex && hex.length > 1) ? toId(hex) : 'b30000') + '"><b>' + Chat.escapeHTML(title) + '</b></font>';
 			Wisp.setTitle(targetUser, title);
 			if (Users(targetUser).connected) Users(targetUser).popup("|html|" + Wisp.nameColor(user.name) + " has set your user title to \"" + title + "\".");
 			this.sendReply("|raw|You've set " + Wisp.nameColor(targetUser) + "'s title to \"" + title + "\".");
@@ -980,7 +980,7 @@ exports.commands = {
 			let curRoom = Rooms(rooms[u]);
 			if (!curRoom || rooms[u] === 'global') continue;
 			if (curRoom.type === 'battle') {
-				battleRooms.push('<a href="/' + curRoom.id + '" class="ilink">' + Tools.escapeHTML(curRoom.title) + '</a> (' + curRoom.userCount + ')');
+				battleRooms.push('<a href="/' + curRoom.id + '" class="ilink">' + Chat.escapeHTML(curRoom.title) + '</a> (' + curRoom.userCount + ')');
 			}
 			if (curRoom.type === 'chat') {
 				if (curRoom.isPersonal) {
@@ -988,11 +988,11 @@ exports.commands = {
 					continue;
 				}
 				if (curRoom.isOfficial) {
-					official.push('<a href="/' + toId(curRoom.title) + '" class="ilink">' + Tools.escapeHTML(curRoom.title) + '</a> (' + curRoom.userCount + ')');
+					official.push('<a href="/' + toId(curRoom.title) + '" class="ilink">' + Chat.escapeHTML(curRoom.title) + '</a> (' + curRoom.userCount + ')');
 					continue;
 				}
 				if (curRoom.isPrivate) {
-					privateRoom.push('<a href="/' + toId(curRoom.title) + '" class="ilink">' + Tools.escapeHTML(curRoom.title) + '</a> (' + curRoom.userCount + ')');
+					privateRoom.push('<a href="/' + toId(curRoom.title) + '" class="ilink">' + Chat.escapeHTML(curRoom.title) + '</a> (' + curRoom.userCount + ')');
 					continue;
 				}
 			}
@@ -1023,7 +1023,7 @@ exports.commands = {
 		for (let u in room.users) {
 			let curUser = Users(u);
 			if (!curUser || !curUser.connected || !curUser.can('receiveauthmessages', null, room)) continue;
-			curUser.sendTo(room, '|uhtml|' + id + '|<div class="broadcast-red"><u><b>Staff Declare by ' + Tools.escapeHTML(user.name) + ':</b></u><br />' + target + '</div>');
+			curUser.sendTo(room, '|uhtml|' + id + '|<div class="broadcast-red"><u><b>Staff Declare by ' + Chat.escapeHTML(user.name) + ':</b></u><br />' + target + '</div>');
 		}
 		this.logModCommand(user.name + " staff declared: " + target + " (id: " + id + ")");
 	},
@@ -1045,8 +1045,8 @@ exports.commands = {
 			if (image.length > 100) return this.errorReply("Image URLs may not be longer than 100 characters.");
 
 			Wisp.setBackground(targetUser.userid, image);
-			Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile background to: " + Tools.escapeHTML(image));
-			Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile background to: " + Tools.escapeHTML(image));
+			Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile background to: " + Chat.escapeHTML(image));
+			Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile background to: " + Chat.escapeHTML(image));
 
 			this.sendReply("You've set " + targetUser.name + "'s profile background.");
 		},
@@ -1090,8 +1090,8 @@ exports.commands = {
 			if (song.length > 100) return this.errorReply("Music URLs may not be longer than 100 characters.");
 
 			Wisp.setMusic(targetUser.userid, song);
-			Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile music to: " + Tools.escapeHTML(song));
-			Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile music to: " + Tools.escapeHTML(song));
+			Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile music to: " + Chat.escapeHTML(song));
+			Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has set " + Wisp.nameColor(targetUser.name, true) + "'s profile music to: " + Chat.escapeHTML(song));
 
 			this.sendReply("You've set " + targetUser.name + "'s profile music.");
 		},
@@ -1123,14 +1123,14 @@ exports.commands = {
 		if (!this.can('ban', null, room)) return false;
 		if (!Punishments.roomUserids.get(room.id) || Punishments.roomUserids.get(room.id).size < 1) return this.sendReply("There's no banned users in this room.");
 		let users = {};
-		let output = '|raw|<div style="infobox infobox-limited"><center><u><b>Roombans in ' + Tools.escapeHTML(room.title) + '</b></u><br /><table border="1" cellspacing="0" cellpadding="5">';
+		let output = '|raw|<div style="infobox infobox-limited"><center><u><b>Roombans in ' + Chat.escapeHTML(room.title) + '</b></u><br /><table border="1" cellspacing="0" cellpadding="5">';
 		output += '<tr><th>Name</th><th>Type</th><th>Expires</th><th>Reason</th></tr>';
 		Punishments.roomUserids.get(room.id).forEach((arr, ip) => {
 			if (users[arr[1]] || Date.now() >= arr[2]) return;
 			users[arr[1]] = {
 				type: arr[0],
 				expires: arr[2],
-				reason: (arr[3] ? Tools.escapeHTML(arr[3]) : 'N/A'),
+				reason: (arr[3] ? Chat.escapeHTML(arr[3]) : 'N/A'),
 			};
 		});
 
@@ -1159,7 +1159,7 @@ exports.commands = {
 				ip: (user.group !== '%' ? ip : '*'),
 				type: arr[0],
 				expires: arr[2],
-				reason: (arr[3] ? Tools.escapeHTML(arr[3]) : 'N/A'),
+				reason: (arr[3] ? Chat.escapeHTML(arr[3]) : 'N/A'),
 			};
 		});
 
@@ -1292,7 +1292,7 @@ Object.assign(Wisp, {
 
 	nameColor: function (name, bold) {
 		return (bold ? "<b>" : "") + "<font color=" + this.hashColor(name) + ">" +
-		(Users(name) && Users.getExact(name) ? Tools.escapeHTML(Users.getExact(name).name) : Tools.escapeHTML(name)) +
+		(Users(name) && Users.getExact(name) ? Chat.escapeHTML(Users.getExact(name).name) : Chat.escapeHTML(name)) +
 		"</font>" + (bold ? "</b>" : "");
 	},
 
@@ -1450,7 +1450,7 @@ Object.assign(Wisp, {
 			message = Autolinker.link(message.replace(/&#x2f;/g, '/'), {stripPrefix: false, phone: false, twitter: false});
 			return message;
 		}
-		message = Tools.escapeHTML(message).replace(/&#x2f;/g, '/');
+		message = Chat.escapeHTML(message).replace(/&#x2f;/g, '/');
 		message = message.replace(/\_\_([^< ](?:[^<]*?[^< ])?)\_\_(?![^<]*?<\/a)/g, '<i>$1</i>'); // italics
 		message = message.replace(/\*\*([^< ](?:[^<]*?[^< ])?)\*\*/g, '<b>$1</b>'); // bold
 		message = message.replace(/\~\~([^< ](?:[^<]*?[^< ])?)\~\~/g, '<strike>$1</strike>'); // strikethrough
@@ -1497,7 +1497,7 @@ function getMonData(target) {
 	monData.forEach(function (data) {
 		if (toId(data.split("\n")[0].split(" - ")[0] || " ") === target) {
 			returnData = data.split("\n").map(function (line) {
-				return Tools.escapeHTML(line);
+				return Chat.escapeHTML(line);
 			}).join("<br />");
 		}
 	});

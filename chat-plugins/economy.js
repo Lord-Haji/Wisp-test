@@ -258,7 +258,7 @@ exports.commands = {
 					Users.get(targetUser).popup('|html|' + Wisp.nameColor(user.userid, true) + ' has removed ' + amount + ' ' + (amount === 1 ? 'buck' : 'bucks') +
 					' from you.<br />');
 				}
-				this.sendReply("You removed " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + Tools.escapeHTML(targetUser));
+				this.sendReply("You removed " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + Chat.escapeHTML(targetUser));
 				Economy.logTransaction(user.name + " has taken " + amount + ((amount === 1) ? " buck " : " bucks ") + " from " + targetUser + ". (Reason: " + reason + ") They now have " + newAmount + (newAmount === 1 ? " buck." : " bucks."));
 			});
 		});
@@ -286,7 +286,7 @@ exports.commands = {
 				return this.popupReply('|html|<center>' +
 					'<button class = "card-td button" name = "send" value = "/confirmtransferbucks ' + toId(targetUser) + ', ' + amount + '"' +
 					'style = "outline: none; width: 200px; font-size: 11pt; padding: 10px; border-radius: 14px ; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4) inset; transition: all 0.2s;">' +
-					'Confirm transfer to <br><b style = "color:' + Wisp.hashColor(targetUser) + '; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)">' + Tools.escapeHTML(targetUser) + '</b></button></center>'
+					'Confirm transfer to <br><b style = "color:' + Wisp.hashColor(targetUser) + '; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)">' + Chat.escapeHTML(targetUser) + '</b></button></center>'
 				);
 			}
 			Economy.writeMoney(user.userid, -amount, () => {
@@ -354,8 +354,8 @@ exports.commands = {
 				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
 					Economy.readMoney(user.userid, amount => {
 						Economy.logTransaction(user.name + " has purchased a chat room for " + prices[itemid] + " bucks.  They now have " + amount + (amount === 1 ? " buck." : " bucks."));
-						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a chat room. Name: " + Tools.escapeHTML(targetSplit[1]));
-						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a chat room named \"" + Tools.escapeHTML(targetSplit[1]) + "\".").update();
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a chat room. Name: " + Chat.escapeHTML(targetSplit[1]));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a chat room named \"" + Chat.escapeHTML(targetSplit[1]) + "\".").update();
 						this.sendReply("You've purchased a chat room. You will be notified when it has been created.");
 					});
 				});
@@ -367,8 +367,8 @@ exports.commands = {
 				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
 					Economy.readMoney(user.userid, amount => {
 						Economy.logTransaction(user.name + " has purchased a poof message for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
-						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Tools.escapeHTML(targetSplit[1]));
-						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Tools.escapeHTML(targetSplit[1])).update();
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Chat.escapeHTML(targetSplit[1]));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a poof message. Message: " + Chat.escapeHTML(targetSplit[1])).update();
 						this.sendReply("You've purchased a poof message. It will be added shortly.");
 					});
 				});
@@ -386,10 +386,10 @@ exports.commands = {
 						Economy.logTransaction(user.name + " has purchased a user title " + prices[itemid] + " bucks. Title: " + targetSplit[1] + (hex ? " Hex: " + hex : "") +
 						". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
 						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a title: <b><font color=\"" + (hex ? hex : "#b30000") + "\">" +
-						Tools.escapeHTML(targetSplit[1]) + "</b></font><br />" +
+						Chat.escapeHTML(targetSplit[1]) + "</b></font><br />" +
 						"<button name=\"send\" value=\"/title set, " + user.userid + ", " + targetSplit[1] + (hex ? ", " + hex : "") + "\">Click to add</button>");
 						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a title: <b><font color=\"" + (hex ? hex : "#b30000") + "\">" +
-						Tools.escapeHTML(targetSplit[1]) + "</b></font>").update();
+						Chat.escapeHTML(targetSplit[1]) + "</b></font>").update();
 						this.sendReply("You have purchased a title. It will be added shortly.");
 					});
 				});
@@ -413,8 +413,8 @@ exports.commands = {
 				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
 					Economy.readMoney(user.userid, amount => {
 						Economy.logTransaction(user.name + " has purchased a declare for " + prices[itemid] + " bucks. They now have " + amount + (amount === 1 ? " buck." : " bucks."));
-						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Tools.escapeHTML(targetSplit[1]));
-						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Tools.escapeHTML(targetSplit[1])).update();
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Chat.escapeHTML(targetSplit[1]));
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a declare. Message: " + Chat.escapeHTML(targetSplit[1])).update();
 						this.sendReply("You have purchased a declare. Please message an Administrator with the message you would like to declare.");
 					});
 				});
@@ -444,7 +444,7 @@ exports.commands = {
 						Economy.logTransaction(user.name + " has purchased a room shop for " + prices[itemid] + " bucks. Room: " + targetRoom.title + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
 						matched = true;
 						this.sendReply(targetRoom.title + " has received a shop. The room owners of that room should view /roomshop help to view the room shop commands.");
-						targetRoom.add('|raw|<div class="broadcast-green"><b>' + Tools.escapeHTML(user.name) + ' has just purchased a room shop for this room.</b></div>');
+						targetRoom.add('|raw|<div class="broadcast-green"><b>' + Chat.escapeHTML(user.name) + ' has just purchased a room shop for this room.</b></div>');
 						targetRoom.update();
 						targetRoom.shop = {};
 						targetRoom.shopList = [];
@@ -460,12 +460,12 @@ exports.commands = {
 				if (!targetSplit[2]) return this.sendReply("Please specify the image you would like as your emote with /buy emote, name, image url.");
 				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
 					Economy.readMoney(user.userid, amount => {
-						Economy.logTransaction(user.name + " has purchased an emote for " + prices[itemid] + " bucks. Name: " + Tools.escapeHTML(targetSplit[1]) +
+						Economy.logTransaction(user.name + " has purchased an emote for " + prices[itemid] + " bucks. Name: " + Chat.escapeHTML(targetSplit[1]) +
 						" Image: " + targetSplit[2] + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
-						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Tools.escapeHTML(targetSplit[1]) +
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Chat.escapeHTML(targetSplit[1]) +
 						"<img src=\"" + targetSplit[2] + "\" width=\"40\" height=\"40\">" +
 						"<br /><button name=\"send\" value=\"/emote add, " + targetSplit[1] + ", " + targetSplit[2] + "\">Click to add</button>");
-						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Tools.escapeHTML(targetSplit[1]) +
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased an emote. Name: " + Chat.escapeHTML(targetSplit[1]) +
 						" <img src=\"" + targetSplit[2] + "\" width=\"40\" height=\"40\">").update();
 						this.sendReply("You have purchased an emote. It will be added shortly.");
 					});
@@ -478,9 +478,9 @@ exports.commands = {
 				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
 					Economy.readMoney(user.userid, amount => {
 						Economy.logTransaction(user.userid + " has purchased a custom profile background for " + prices[itemid] + " bucks. Image: " + targetSplit[1]);
-						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a profile background: <a href=\"" + Tools.escapeHTML(targetSplit[1]) + "\">" + Tools.escapeHTML(targetSplit[1]) +
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a profile background: <a href=\"" + Chat.escapeHTML(targetSplit[1]) + "\">" + Chat.escapeHTML(targetSplit[1]) +
 						"</a><br /><button name=\"send\" value=\"/background set " + user.userid + ", " + targetSplit[1] + "\">Click to add</button>");
-						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a profile background: " + Tools.escapeHTML(targetSplit[1])).update();
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a profile background: " + Chat.escapeHTML(targetSplit[1])).update();
 						this.sendReply("You have purchased a profile background. It will be added shortly.");
 					});
 				});
@@ -492,9 +492,9 @@ exports.commands = {
 				Economy.writeMoney(user.userid, prices[itemid] * -1, () => {
 					Economy.readMoney(user.userid, amount => {
 						Economy.logTransaction(user.userid + " has purchased profile music for " + prices[itemid] + " bucks. Music URL: " + targetSplit[1]);
-						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased profile music: <a href=\"" + Tools.escapeHTML(targetSplit[1]) + "\">" + Tools.escapeHTML(targetSplit[1]) +
+						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased profile music: <a href=\"" + Chat.escapeHTML(targetSplit[1]) + "\">" + Chat.escapeHTML(targetSplit[1]) +
 						"</a><br /><button name=\"send\" value=\"/music set " + user.userid + ", " + targetSplit[1] + "\">Click to add</button>");
-						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased profile music: " + Tools.escapeHTML(targetSplit[1])).update();
+						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased profile music: " + Chat.escapeHTML(targetSplit[1])).update();
 						this.sendReply("You have purchased profile music. It will be added shortly.");
 					});
 				});
@@ -521,10 +521,10 @@ exports.commands = {
 					Economy.readMoney(user.userid, amount => {
 						Economy.logTransaction(user.name + " has purchased a custom color for " + prices[itemid] + " bucks. Image: " + targetSplit[1] + ". They now have " + amount + (amount === 1 ? " buck." : " bucks."));
 						Wisp.messageSeniorStaff("/html " + Wisp.nameColor(user.name, true) + " has purchased a custom color. Color: <font color=\"" + targetSplit[1] +
-						"\">" + Tools.escapeHTML(user.name) + "</font>" +
+						"\">" + Chat.escapeHTML(user.name) + "</font>" +
 						"<br /><button name=\"send\" value=\"/customcolor set " + user.name + ", " + targetSplit[1] + "\">Click to add</button>");
 						Rooms('upperstaff').add("|raw|" + Wisp.nameColor(user.name, true) + " has purchased a custom color. Color: <font color=\"" + targetSplit[1] +
-						"\">" + Tools.escapeHTML(user.name) + "</font>").update();
+						"\">" + Chat.escapeHTML(user.name) + "</font>").update();
 						this.sendReply("You have purchased a custom color. It will be added shortly.");
 					});
 				});
@@ -608,11 +608,11 @@ exports.commands = {
 		default:
 			if (!this.runBroadcast()) return;
 			if (room.shopList.length < 1) return this.sendReplyBox('<center><b><u>This shop has no items!</u></b></center>');
-			let output = '<center><h4><b><u><font color="#24678d">' + Tools.escapeHTML(room.title) + '\'s Shop</font></u></b></h4><table border="1" cellspacing ="0" cellpadding="3"><tr><th>Item</th><th>Description</th><th>Price</th></tr>';
+			let output = '<center><h4><b><u><font color="#24678d">' + Chat.escapeHTML(room.title) + '\'s Shop</font></u></b></h4><table border="1" cellspacing ="0" cellpadding="3"><tr><th>Item</th><th>Description</th><th>Price</th></tr>';
 			for (let u in room.shopList) {
 				if (!room.shop[room.shopList[u]] || !room.shop[room.shopList[u]].name || !room.shop[room.shopList[u]].description || !room.shop[room.shopList[u]].price) continue;
-				output += '<tr><td><button name="send" value="/roomshop buy ' + Tools.escapeHTML(room.shopList[u]) + '" >' + Tools.escapeHTML(room.shop[room.shopList[u]].name) +
-				'</button></td><td>' + Tools.escapeHTML(room.shop[room.shopList[u]].description.toString()) + '</td><td>' + room.shop[room.shopList[u]].price + '</td></tr>';
+				output += '<tr><td><button name="send" value="/roomshop buy ' + Chat.escapeHTML(room.shopList[u]) + '" >' + Chat.escapeHTML(room.shop[room.shopList[u]].name) +
+				'</button></td><td>' + Chat.escapeHTML(room.shop[room.shopList[u]].description.toString()) + '</td><td>' + room.shop[room.shopList[u]].price + '</td></tr>';
 			}
 			output += '</center><br />';
 			this.sendReplyBox(output);
@@ -746,7 +746,7 @@ exports.commands = {
 						if (err) return console.log("bucks4: " + err);
 						let averageBucks = rows[0]['AVG(bucks)'];
 
-						this.sendReplyBox("The richest user is currently <b><font color=#24678d>" + Tools.escapeHTML(richestUser) + "</font></b> with <b><font color=#24678d>" +
+						this.sendReplyBox("The richest user is currently <b><font color=#24678d>" + Chat.escapeHTML(richestUser) + "</font></b> with <b><font color=#24678d>" +
 							richestUserMoney + "</font></b> bucks.</font></b><br />There is a total of <b><font color=#24678d>" +
 							userCount + "</font></b> users with at least one buck.<br /> The average user has " +
 							"<b><font color=#24678d>" + Math.round(averageBucks) + "</font></b> bucks.<br /> There is a total of <b><font color=#24678d>" +
@@ -863,20 +863,20 @@ exports.commands = {
 
 		getProfileData(userid, userData => {
 			let reply = '';
-			reply += '|raw|<div class="infobox"' + (userData.background === '' ? '' : ' style="background: url(&quot;' + Tools.escapeHTML(userData.background) + '&quot;); background-size: contain;"') + '>';
+			reply += '|raw|<div class="infobox"' + (userData.background === '' ? '' : ' style="background: url(&quot;' + Chat.escapeHTML(userData.background) + '&quot;); background-size: contain;"') + '>';
 			reply += '<table' + (userData.background === '' ? '' : '') + '><tr>';
 
 			reply += '<td' + (userData.background === '' ? '' : ' style="background-color: rgba(255, 255, 255, 0.8); border-radius: 25px; padding: 10px;"') + '><img src="' + avatar + '" height="80" width="80"></td>';
 			reply += '<td' + (userData.background === '' ? '' : ' style="background-color: rgba(255, 255, 255, 0.8); border-radius: 25px; padding: 10px;"') + '><font color="#B30000"><b>Name:</b></font> ' + Wisp.nameColor(userid, true) + (userData.title === "" ? '' : ' (' + userData.title + ')') + flag + '<br />';
 			reply += '<font color="#B30000"><b>Registered:</b></font> ' + userData.regdate + '<br />';
-			reply += '<font color="#B30000"><b>Rank:</b></font> ' + Tools.escapeHTML(userGroup) + '<br />';
+			reply += '<font color="#B30000"><b>Rank:</b></font> ' + Chat.escapeHTML(userGroup) + '<br />';
 			reply += '<font color="#B30000"><b>League:</b></font> ' + (league ? league + (leagueRank ? ' (' + leagueRank + ')' : '') : 'N/A') + '<br />';
 			reply += '<font color="#B30000"><b>Bucks:</b></font> ' + userData.bucks + '<br />';
 			reply += '<font color="#B30000"><b>Last Online:</b></font> ' + (targetUser && targetUser.connected ? '<font color="green">Currently Online</font> (Last Active: ' + moment(targetUser.lastActive).fromNow() + ')' : (userData.lastOnline === 'Never' ? userData.lastOnline : moment(userData.lastOnline).format("MMMM Do YYYY, h:mm:ss A") + ' EST. (' + moment(userData.lastOnline).fromNow() + ')')) + '<br />';
 
 			reply += '</td><td><div class="card-button" style="background: rgba(255, 255, 255, 0.8); text-align: center; border-radius: 12px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2) inset; margin: 2px 2px 2px 0px">' + badges() + '</div></td>';
 			reply += '</tr>';
-			if (userData.music !== "") reply += '<tr><td colspan="2"><audio style="width: 100%;"src="' + Tools.escapeHTML(userData.music) + '" controls=""></audio></td></tr>';
+			if (userData.music !== "") reply += '<tr><td colspan="2"><audio style="width: 100%;"src="' + Chat.escapeHTML(userData.music) + '" controls=""></audio></td></tr>';
 			reply += '</table></div>';
 
 			//reply += '<div style="position: relative; left: 50px; background: rgba(255, 255, 255, 0.8);float: left; text-align: center; border-radius: 12px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2) inset; margin: 2px 2px 2px 0px" class="card-button">' + badges() + '</div><br clear="all"/></div>';
@@ -884,7 +884,7 @@ exports.commands = {
 			/*lastOnline = (lastOnline ? moment(lastOnline).format("MMMM Do YYYY, h:mm:ss A") + ' EST. (' + moment(lastOnline).fromNow() + ')' : "Never");
 			if (targetUser && targetUser.connected && targetUser.lastActive) lastOnline = moment(targetUser.lastActive).fromNow();
 			let profile = '|raw|';
-			profile += '<div class="infobox"' + ((background && background !== '') ? ' style="background: url&quot;' + Tools.escapeHTML(background) + '&quot;); background-size: contain;">' : '>');
+			profile += '<div class="infobox"' + ((background && background !== '') ? ' style="background: url&quot;' + Chat.escapeHTML(background) + '&quot;); background-size: contain;">' : '>');
 			profile += '<div style="float: left; width: 500px; background: rgba(255, 255, 255, 0.8); border-radius: 25px; padding: 10px;"> <img src="' + avatar + '" height=80 width=80 align=left>';
 			profile += '&nbsp;<font color=#b30000><b>Name: </font>' + Wisp.nameColor(userid, true) + (title === "" ? "" : " (" + title + ")") + flag + '<br />';
 			profile += '&nbsp;<font color=#b30000><b>Registered: </font></b>' + regdate + '<br />';

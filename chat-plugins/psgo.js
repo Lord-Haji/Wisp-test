@@ -172,8 +172,8 @@ function getShopDisplay(shop) {
 	let display = "<table width='100%' border='1' style='border-collapse: collapse; color: #444; box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);' cellpadding='5'>" +
 		"<tr><th class='card-th' style='background-image: -moz-linear-gradient(center top , #EBF3FC, #DCE9F9); box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.8) inset;'>Command</th><th class='card-th' style='background-image: -moz-linear-gradient(center top , #EBF3FC, #DCE9F9); box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.8) inset;'>Description</th><th class='card-th' style='background-image: -moz-linear-gradient(center top , #EBF3FC, #DCE9F9); box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.8) inset;'>Cost</th></tr>";
 	for (let u in shop) {
-		display += "<tr>" + "<td class='card-td'><button name='send' value='/buypack " + u + "' style='border-radius: 12px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2) inset;'><b>" + Tools.escapeHTML(shop[u].name) + "</b></button></td>" +
-			"<td class='card-td'>" + Tools.escapeHTML(shop[u].desc) + "</td>" +
+		display += "<tr>" + "<td class='card-td'><button name='send' value='/buypack " + u + "' style='border-radius: 12px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2) inset;'><b>" + Chat.escapeHTML(shop[u].name) + "</b></button></td>" +
+			"<td class='card-td'>" + Chat.escapeHTML(shop[u].desc) + "</td>" +
 			"<td class='card-td'>" + shop[u].price + "</td>" +
 			"</tr>";
 	}
@@ -192,7 +192,7 @@ function claimPackPopup(user, message) {
 	let count = 0;
 	for (let u in claimPacks) {
 		if (count === 0) output += '<tr>';
-		output += '<td><button name="send" value="/' + cmd + ' ' + toId(claimPacks[u]) + '">' + Tools.escapeHTML(claimPacks[u]) + '</button></td>';
+		output += '<td><button name="send" value="/' + cmd + ' ' + toId(claimPacks[u]) + '">' + Chat.escapeHTML(claimPacks[u]) + '</button></td>';
 		count++;
 		if (count >= 5) {
 			output += '</tr>';
@@ -217,7 +217,7 @@ function showPacks(user) {
 	if (!Users.userPacks[user] || Users.userPacks[user].length < 1) return (user === user.userid ? 'You have' : user + ' has') + ' no packs.';
 	let output = '<div class="infobox infobox-limited"<u><b>List of packs:</b></u>';
 	for (let i = 0; i < Users.userPacks[user].length; i++) {
-		output += '<br /><button name="send" value="/openpack ' + Users.userPacks[user][i] + '"> Press to open <b>' + Tools.escapeHTML(packs[Users.userPacks[user][i]]) + '</b> pack</button>';
+		output += '<br /><button name="send" value="/openpack ' + Users.userPacks[user][i] + '"> Press to open <b>' + Chat.escapeHTML(packs[Users.userPacks[user][i]]) + '</b> pack</button>';
 	}
 	output += '</div>';
 	return output;
@@ -266,7 +266,7 @@ exports.commands = {
 		if (!Users.userPacks[user.userid]) Users.userPacks[user.userid] = [];
 		Users.userPacks[user.userid].push(toId(target));
 
-		this.sendReplyBox('You have claimed the pack "' + Tools.escapeHTML(target) + '"<br /><button name="send" value="/openpack ' + toId(target) + '">Use <b>/openpack ' + toId(target) + '</b> to open</button>');
+		this.sendReplyBox('You have claimed the pack "' + Chat.escapeHTML(target) + '"<br /><button name="send" value="/openpack ' + toId(target) + '">Use <b>/openpack ' + toId(target) + '</b> to open</button>');
 		if (user.claimPacks > 0) return claimPackPopup(user, "You have " + user.claimPacks + " more " + (user.claimPacks === 1 ? "pack" : "packs") + " to claim.");
 		user.popup("|modal|You have claimed all the packs from your ticket. See /packs to open them.");
 	},
@@ -493,7 +493,7 @@ exports.commands = {
 			list: function (target, room, user) {
 				let output = [];
 				for (let u in packs) output.push(packs[u]);
-				this.sendReplyBox("Packs: <br />" + Tools.escapeHTML(output.join(', ')));
+				this.sendReplyBox("Packs: <br />" + Chat.escapeHTML(output.join(', ')));
 			},
 			'': 'packhelp',
 			packhelp: function (target, room, user) {
@@ -602,7 +602,7 @@ exports.commands = {
 		Economy.readMoney(user.userid, amount => {
 			if (cost > amount) return this.sendReply("You need " + (cost - amount) + " more bucks to buy this pack.");
 			Economy.writeMoney(user.userid, -1 * cost, () => {
-				this.sendReply('|raw|You have bought ' + Tools.escapeHTML(packs[packId]) + ' pack for ' + cost + ' bucks. Use <button name="send" value="/openpack ' + packId + '"><b>/openpack ' + Tools.escapeHTML(packs[packId]) + '</b></button> to open your pack.');
+				this.sendReply('|raw|You have bought ' + Chat.escapeHTML(packs[packId]) + ' pack for ' + cost + ' bucks. Use <button name="send" value="/openpack ' + packId + '"><b>/openpack ' + Chat.escapeHTML(packs[packId]) + '</b></button> to open your pack.');
 				this.sendReply("You have until the server restarts to open your pack.");
 				if (!Users.userPacks[user.userid]) Users.userPacks[user.userid] = [];
 				Users.userPacks[user.userid].push(packId);
@@ -648,8 +648,8 @@ exports.commands = {
 			addCard(user.userid, card.id);
 
 			this.sendReplyBox(Wisp.nameColor(user.name, true) + ' got a <font color="' + colors[rarity] + '">' + card.rarity + '</font> ' +
-				'<button name="send" value="/card ' + card.id + '"><b>' + Tools.escapeHTML(card.name) + '</b></button> from a ' +
-				'<button name="send" value="/buypack ' + packId + '">' + Tools.escapeHTML(packs[packId]) + ' Pack</button>.'
+				'<button name="send" value="/card ' + card.id + '"><b>' + Chat.escapeHTML(card.name) + '</b></button> from a ' +
+				'<button name="send" value="/buypack ' + packId + '">' + Chat.escapeHTML(packs[packId]) + ' Pack</button>.'
 			);
 		}
 		Users.userPacks[user.userid].splice(Users.userPacks[user.userid].indexOf(packId), 1);
@@ -677,12 +677,12 @@ exports.commands = {
 		this.logModCommand(user.name + " has given the pack " + packs[packId] + " to " + targetUser.name);
 		this.sendReply(targetUser.name + " was given the pack " + packs[packId] + ". This user now has " + Users.userPacks[targetUser.userid].length + (Users.userPacks[targetUser.userid].length === 1 ? " pack." : " packs."));
 		targetUser.popup('|html|' +
-			Wisp.nameColor(user.name, true) + ' has given you the pack ' + Tools.escapeHTML(packs[packId]) + '. You have until the server restarts to open your pack.<br />'
+			Wisp.nameColor(user.name, true) + ' has given you the pack ' + Chat.escapeHTML(packs[packId]) + '. You have until the server restarts to open your pack.<br />'
 		);
 		targetUser.send(
-			'|raw|<div class="infobox">' + Wisp.nameColor(user.name, true) + ' has given you the pack ' + Tools.escapeHTML(packs[packId]) +
+			'|raw|<div class="infobox">' + Wisp.nameColor(user.name, true) + ' has given you the pack ' + Chat.escapeHTML(packs[packId]) +
 			'. You have until the server restarts to open your pack.<br />' +
-			'Use <button name="send" value="/openpack ' + packId + '"><b>/openpack ' + Tools.escapeHTML(packs[packId]) + '</b></button> to open your pack.</div>'
+			'Use <button name="send" value="/openpack ' + packId + '"><b>/openpack ' + Chat.escapeHTML(packs[packId]) + '</b></button> to open your pack.</div>'
 		);
 	},
 	givepackhelp: ["/givepack [user], [pack] - Gives a user a PSGO pack."],
@@ -708,7 +708,7 @@ exports.commands = {
 
 		this.sendReply("You've removed the pack " + packs[packId] + " from " + targetUser.name + ". They now have " + Users.userPacks[targetUser.userid].length +
 			Users.userPacks[targetUser.userid].length + (Users.userPacks[targetUser.userid].length === 1 ? " pack." : " packs."));
-		targetUser.popup('|html|' + Wisp.nameColor(user.name, true) + " has taken the pack " + Tools.escapeHTML(packs[packId]) + " from you.<br />" +
+		targetUser.popup('|html|' + Wisp.nameColor(user.name, true) + " has taken the pack " + Chat.escapeHTML(packs[packId]) + " from you.<br />" +
 			"You now have " + Users.userPacks[targetUser.userid].length + Users.userPacks[targetUser.userid].length + (Users.userPacks[targetUser.userid].length === 1 ? " pack." : " packs."));
 	},
 	takepackhelp: ["/takepack [user], [pack] - Takes an unopened pack from a user."],
@@ -794,7 +794,7 @@ exports.commands = {
 						let card = cardData[cards[u]];
 						if (!card) continue;
 						output += '<button name="send" value="/card ' + card.id + '" style="border-radius: 12px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2) inset;" class="card-button">';
-						output += '<img src="' + card.image + '" width="80" height="111" title="' + Tools.escapeHTML(card.name) + '"></button>';
+						output += '<img src="' + card.image + '" width="80" height="111" title="' + Chat.escapeHTML(card.name) + '"></button>';
 					}
 					output += '</div><br /><center>' + Wisp.nameColor(target, true) + ' has ' + cards.length + ' cards and ' + points + ' points.</center>';
 					if (sortMsg !== '') output += '<br /><center>Sorting ' + sortMsg + '</center>';
@@ -819,17 +819,17 @@ exports.commands = {
 		let output = '';
 		output += '<div class="' + (this.targetUser ? 'infobox"' : 'card-div card-td" style="box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);') + '">';
 		if (!this.targetUser) {
-			output += '<img src="' + card.image + '" height="220" title="' + Tools.escapeHTML(card.name) + '" align="right">';
-			output += '<h1>' + Tools.escapeHTML(card.name) + '</h1>';
-			output += '<br /><br /><h1><font color="' + colors[toId(card.rarity)] + '">' + Tools.escapeHTML(card.rarity) + '</font></h1>';
+			output += '<img src="' + card.image + '" height="220" title="' + Chat.escapeHTML(card.name) + '" align="right">';
+			output += '<h1>' + Chat.escapeHTML(card.name) + '</h1>';
+			output += '<br /><br /><h1><font color="' + colors[toId(card.rarity)] + '">' + Chat.escapeHTML(card.rarity) + '</font></h1>';
 		} else {
-			output += '<img src="' + card.image + '" width="108" height="150" title="' + Tools.escapeHTML(card.name) + '" align="right">';
-			output += '<br /><br /><font color="#AAA"><i>Name:</i></font> ' + Tools.escapeHTML(card.name);
-			output += '<br /><br /><font color="#AAA"><i>Rarity:</i></font> <font color="' + colors[toId(card.rarity)] + '">' + Tools.escapeHTML(card.rarity) + '</font>';
+			output += '<img src="' + card.image + '" width="108" height="150" title="' + Chat.escapeHTML(card.name) + '" align="right">';
+			output += '<br /><br /><font color="#AAA"><i>Name:</i></font> ' + Chat.escapeHTML(card.name);
+			output += '<br /><br /><font color="#AAA"><i>Rarity:</i></font> <font color="' + colors[toId(card.rarity)] + '">' + Chat.escapeHTML(card.rarity) + '</font>';
 		}
 		output += '<br /><br /><font color="#AAA"><i>Points:</i></font> ' + card.points;
 		output += '<br /><br /><font color="#AAA"><i>Card ID:</i></font> ' + card.id;
-		output += '<br /><br /><font color="#AAA"><i>Found in Packs:</i></font> ' + Tools.escapeHTML(collections.join(', '));
+		output += '<br /><br /><font color="#AAA"><i>Found in Packs:</i></font> ' + Chat.escapeHTML(collections.join(', '));
 		output += '<br clear="all">';
 		this.sendReply('|raw|' + output);
 	},
@@ -898,7 +898,7 @@ exports.commands = {
 		const letters = "abcdefghijklmnopqrstuvwxyz".split("");
 		const categories = {
 			Rarity: ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'], // rarities
-			Packs: Tools.escapeHTML(shopPacks.join(', ')).split(', '),
+			Packs: Chat.escapeHTML(shopPacks.join(', ')).split(', '),
 			Types: ['Water', 'Fire', 'Fighting', 'Fairy', 'Dragon', 'Colorless', 'Psychic', 'Lightning', 'Darkness', 'Grass', 'Metal'],
 			Tiers: ['OU-Pack', 'UU-Pack', 'Uber-Pack', 'PU-Pack', 'NU-Pack', 'RU-Pack', 'LC-Pack', 'BL-Pack', 'BL2-Pack', 'BL3-Pack'],
 			Generation: ['Gen1', 'Gen2', 'Gen3', 'Gen4', 'Gen5', 'Gen6'],
@@ -1172,7 +1172,7 @@ exports.commands = {
 			// the image
 			let cardImage = '<img src="' + card.image + '" height=250>';
 			// rarity display
-			let cardRarityPoints = '(<font color="' + colors[toId(card.rarity)] + '">' + Tools.escapeHTML(card.rarity) + '</font> - ' + card.points + ')<br />';
+			let cardRarityPoints = '(<font color="' + colors[toId(card.rarity)] + '">' + Chat.escapeHTML(card.rarity) + '</font> - ' + card.points + ')<br />';
 			let userSideDisplay = '<center>' + user.userid + '<br />' + cardImage + "<br />" + cardRarityPoints + '</center>';
 
 			// now build the target's side
@@ -1180,7 +1180,7 @@ exports.commands = {
 			// the image
 			cardImage = '<img src="' + card.image + '" height=250>';
 			// rarity display
-			cardRarityPoints = '(<font color="' + colors[toId(card.rarity)] + '">' + Tools.escapeHTML(card.rarity) + '</font> - ' + card.points + ')<br />';
+			cardRarityPoints = '(<font color="' + colors[toId(card.rarity)] + '">' + Chat.escapeHTML(card.rarity) + '</font> - ' + card.points + ')<br />';
 			let targetSideDisplay = "<center>" + (displayTrade.fromUser !== user.userid ? displayTrade.fromUser : displayTrade.toUser) + '<br />' + cardImage + "<br />" + cardRarityPoints + "</center>";
 
 			// now build the entire popup

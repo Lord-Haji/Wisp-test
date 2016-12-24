@@ -59,8 +59,8 @@ exports.commands = {
 			if (!target[1]) return this.parse('/help customcolor');
 			if (toId(target[0]).length > 19) return this.errorReply("Usernames are not this long...");
 
-			this.sendReply("|raw|You have given <b><font color=" + target[1] + ">" + Tools.escapeHTML(target[0]) + "</font></b> a custom color.");
-			Rooms('upperstaff').add('|raw|' + Tools.escapeHTML(target[0]) + " has recieved a <b><font color=" + target[1] + ">custom color</fon></b> from " + Tools.escapeHTML(user.name) + ".").update();
+			this.sendReply("|raw|You have given <b><font color=" + target[1] + ">" + Chat.escapeHTML(target[0]) + "</font></b> a custom color.");
+			Rooms('upperstaff').add('|raw|' + Chat.escapeHTML(target[0]) + " has recieved a <b><font color=" + target[1] + ">custom color</fon></b> from " + Chat.escapeHTML(user.name) + ".").update();
 			this.privateModCommand("(" + target[0] + " has recieved custom color: '" + target[1] + "' from " + user.name + ".)");
 			Wisp.customColors[toId(target[0])] = target[1];
 			updateColor();
@@ -82,7 +82,7 @@ exports.commands = {
 			target = target.split(',');
 			for (let u in target) target[u] = target[u].trim();
 			if (!target[1]) return this.parse('/help customcolor');
-			return this.sendReplyBox('<b><font size="3" color="' + target[1] + '">' + Tools.escapeHTML(target[0]) + '</font></b>');
+			return this.sendReplyBox('<b><font size="3" color="' + target[1] + '">' + Chat.escapeHTML(target[0]) + '</font></b>');
 		},
 		reload: function (target, room, user) {
 			if (!this.can('hotpatch')) return false;

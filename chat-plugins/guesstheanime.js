@@ -134,13 +134,13 @@ class GuessTheAnime {
 		if (this.guessed.includes(toId(guess))) return self.sendReply("'" + guess + "' has already been guessed.");
 
 		if (this.answers.map(toId).includes(toId(guess))) {
-			this.room.add('|html|<b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Tools.escapeHTML(user.name) + '</b> guessed <b>' + guess + '</b>, which was the correct answer!').update();
+			this.room.add('|html|<b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Chat.escapeHTML(user.name) + '</b> guessed <b>' + guess + '</b>, which was the correct answer!').update();
 			this.points.set(user, (this.points.get(user) || 0) + 1);
 			if (this.points.get(user) >= this.winNum) return this.win(user);
 			clearTimeout(this.timer);
 			this.proceed();
 		} else {
-			this.room.add('|html|<b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Tools.escapeHTML(user.name) + "</b> guessed <b>" + guess + "</b>, but was incorrect...").update();
+			this.room.add('|html|<b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Chat.escapeHTML(user.name) + "</b> guessed <b>" + guess + "</b>, but was incorrect...").update();
 			this.guessed.push(toId(guess));
 			this.guesses.set(user, (this.guesses.get(user) || 0) + 1);
 		}
@@ -172,7 +172,7 @@ class GuessTheAnime {
 	win(user) {
 		if (!this.points.has(user)) return;
 
-		this.room.add('|html|<div class = "infobox"><center>The winner of this game of Guess the Anime is <b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Tools.escapeHTML(user.name) + '!</b> Gratz!</center>');
+		this.room.add('|html|<div class = "infobox"><center>The winner of this game of Guess the Anime is <b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Chat.escapeHTML(user.name) + '!</b> Gratz!</center>');
 		this.end();
 	}
 	skip(user, self) {
@@ -181,13 +181,13 @@ class GuessTheAnime {
 		this.resetTimer();
 
 		this.room.add('|html|' +
-			'This round has been skipped by <b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Tools.escapeHTML(user.name) + '</b>. ' + this.getAnswers()
+			'This round has been skipped by <b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Chat.escapeHTML(user.name) + '</b>. ' + this.getAnswers()
 		).update();
 		this.proceed();
 	}
 	end(user) {
 		clearTimeout(this.timer);
-		if (user) this.room.add('|html|This game of <b>Guess the Anime</b> has been forcibly ended by <b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Tools.escapeHTML(user.name) + '.</b>');
+		if (user) this.room.add('|html|This game of <b>Guess the Anime</b> has been forcibly ended by <b style = "color:' + Wisp.hashColor(user.userid) + ';">' + Chat.escapeHTML(user.name) + '.</b>');
 		delete this.room.guesstheanime;
 	}
 }

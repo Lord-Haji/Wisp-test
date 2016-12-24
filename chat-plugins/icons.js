@@ -52,9 +52,9 @@ exports.commands = {
 			if (!target[1]) return this.parse('/help icon');
 			if (toId(target[0]).length > 19) return this.errorReply("Usernames are not this long...");
 
-			this.sendReply("|raw|You have given <b><font color=" + Wisp.hashColor(Tools.escapeHTML(target[0])) + ">" + Tools.escapeHTML(target[0]) + "</font></b> an icon.");
+			this.sendReply("|raw|You have given <b><font color=" + Wisp.hashColor(Chat.escapeHTML(target[0])) + ">" + Chat.escapeHTML(target[0]) + "</font></b> an icon.");
 			if (Users(target[0]) && Users(target[0]).connected) Users(target[0]).popup("|modal||html|" + Wisp.nameColor(user.name, true) + " has set your icon as : <img src='" + target[1] + "' width='32' height='32'");
-			Rooms('upperstaff').add('|raw|<b><font color="' + Wisp.hashColor(Tools.escapeHTML(target[0])) + '">' + Tools.escapeHTML(target[0]) + '</font> has received an icon from ' + Tools.escapeHTML(user.name) + '.</b>').update();
+			Rooms('upperstaff').add('|raw|<b><font color="' + Wisp.hashColor(Chat.escapeHTML(target[0])) + '">' + Chat.escapeHTML(target[0]) + '</font> has received an icon from ' + Chat.escapeHTML(user.name) + '.</b>').update();
 			this.privateModCommand("(" + target[0] + " has recieved icon: '" + target[1] + "' from " + user.name + ".)");
 			icons[toId(target[0])] = target[1];
 			updateIcons();

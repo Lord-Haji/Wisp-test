@@ -16,6 +16,8 @@ const TIMEOUT_INACTIVE_DEALLOCATE = 40 * 60 * 1000;
 const REPORT_USER_STATS_INTERVAL = 10 * 60 * 1000;
 const PERIODIC_MATCH_INTERVAL = 60 * 1000;
 
+const CRASH_REPORT_THROTTLE = 60 * 60 * 1000;
+
 const fs = require('fs');
 const path = require('path');
 
@@ -89,6 +91,9 @@ class Room {
 	logEntry() {}
 	addRaw(message) {
 		return this.add('|raw|' + message);
+	}
+	addLogMessage(user, text) {
+		return this.add('|c|' + user.getIdentity(this) + '|/log ' + text).update();
 	}
 	getLogSlice(amount) {
 		let log = this.log.slice(amount);
@@ -200,6 +205,9 @@ class Room {
 		this.runMuteTimer();
 
 		user.updateIdentity(this.id);
+
+		if (!(this.isPrivate === true || this.isPersonal || this.battle)) Punishments.monitorRoomPunishments(user);
+
 		return userid;
 	}
 	unmute(userid, notifyText) {
@@ -399,17 +407,18 @@ class GlobalRoom {
 			return this.formatList;
 		}
 		this.formatList = '|formats' + (Ladders.formatsListPrefix || '');
-		let curSection = '';
+		let section = '', prevSection = '';
+		let curColumn = 1;
 		for (let i in Tools.data.Formats) {
 			let format = Tools.data.Formats[i];
+			if (format.section) section = format.section;
+			if (format.column) curColumn = format.column;
+			if (!format.name) continue;
 			if (!format.challengeShow && !format.searchShow && !format.tournamentShow) continue;
 
-			let section = format.section;
-			if (section === undefined) section = format.mod;
-			if (!section) section = '';
-			if (section !== curSection) {
-				curSection = section;
-				this.formatList += '|,' + (format.column || 1) + '|' + section;
+			if (section !== prevSection) {
+				prevSection = section;
+				this.formatList += '|,' + curColumn + '|' + section;
 			}
 			this.formatList += '|' + format.name;
 			let displayCode = 0;
@@ -425,12 +434,14 @@ class GlobalRoom {
 	getRoomList(filter) {
 		let rooms = [];
 		let skipCount = 0;
-		if (this.battleCount > 150 && !filter) {
+		let [formatFilter, eloFilter] = filter.split(',');
+		if (this.battleCount > 150 && !formatFilter && !eloFilter) {
 			skipCount = this.battleCount - 150;
 		}
 		Rooms.rooms.forEach(room => {
 			if (!room || !room.active || room.isPrivate) return;
-			if (filter && filter !== room.format && filter !== true) return;
+			if (formatFilter && formatFilter !== room.format) return;
+			if (eloFilter && (!room.rated || room.rated < eloFilter)) return;
 			if (skipCount && skipCount--) return;
 
 			rooms.push(room);
@@ -528,7 +539,7 @@ class GlobalRoom {
 
 		// search must be within range
 		let searchRange = 100, elapsed = Date.now() - Math.min(search1.time, search2.time);
-		if (formatid === 'ou' || formatid === 'oucurrent' || formatid === 'randombattle') searchRange = 50;
+		if (formatid === 'ou' || formatid === 'oucurrent' || formatid === 'oususpecttest' || formatid === 'randombattle') searchRange = 50;
 		searchRange += elapsed / 300; // +1 every .3 seconds
 		if (searchRange > 300) searchRange = 300 + (searchRange - 300) / 10; // +1 every 3 sec after 300
 		if (searchRange > 600) searchRange = 600;
@@ -619,7 +630,7 @@ class GlobalRoom {
 	}
 	addChatRoom(title) {
 		let id = toId(title);
-		if (id === 'battles' || id === 'rooms' || id === 'ladder' || id === 'teambuilder') return false;
+		if (id === 'battles' || id === 'rooms' || id === 'ladder' || id === 'teambuilder' || id === 'home') return false;
 		if (Rooms.rooms.has(id)) return false;
 
 		let chatRoomData = {
@@ -810,6 +821,53 @@ class GlobalRoom {
 	modlog(text) {
 		this.modlogStream.write('[' + (new Date().toJSON()) + '] ' + text + '\n');
 	}
+	startLockdown(err, slow) {
+		if (this.lockdown && err) return;
+		let devRoom = Rooms('development');
+		const stack = (err ? Chat.escapeHTML(err.stack).split(`\n`).slice(0, 2).join(`<br />`) : ``);
+		Rooms.rooms.forEach((curRoom, id) => {
+			if (id === 'global') return;
+			if (err) {
+				if (id === 'staff' || id === 'development' || (!devRoom && id === 'lobby')) {
+					curRoom.addRaw(`<div class="broadcast-red"><b>The server needs to restart because of a crash:</b> ${stack}<br />Please restart the server.</div>`);
+					curRoom.addRaw(`<div class="broadcast-red">You will not be able to start new battles until the server restarts.</div>`);
+					curRoom.update();
+				} else {
+					curRoom.addRaw(`<div class="broadcast-red"><b>The server needs restart because of a crash.</b><br />No new battles can be started until the server is done restarting.</div>`).update();
+				}
+			} else {
+				curRoom.addRaw(`<div class="broadcast-red"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>`).update();
+			}
+			if (!slow && curRoom.requestKickInactive && !curRoom.battle.ended) {
+				curRoom.requestKickInactive(false, true);
+				if (curRoom.modchat !== '+') {
+					curRoom.modchat = '+';
+					curRoom.addRaw(`<div class="broadcast-red"><b>Moderated chat was set to +!</b><br />Only users of rank + and higher can talk.</div>`).update();
+				}
+			}
+		});
+
+		this.lockdown = true;
+		this.lastReportedCrash = Date.now();
+	}
+	reportCrash(err) {
+		if (this.lockdown) return;
+		const time = Date.now();
+		if (time - this.lastReportedCrash < CRASH_REPORT_THROTTLE) {
+			return;
+		}
+		this.lastReportedCrash = time;
+		const stack = (err ? Chat.escapeHTML(err.stack).split(`\n`).slice(0, 2).join(`<br />`) : ``);
+		const crashMessage = `|html|<div class="broadcast-red"><b>The server has crashed:</b> ${stack}</div>`;
+		const devRoom = Rooms('development');
+		if (devRoom) {
+			devRoom.add(crashMessage).update();
+		} else {
+			if (Rooms.lobby) Rooms.lobby.add(crashMessage).update();
+			const staffRoom = Rooms('staff');
+			if (staffRoom) staffRoom.add(crashMessage).update();
+		}
+	}
 }
 
 class BattleRoom extends Room {
@@ -860,7 +918,7 @@ class BattleRoom extends Room {
 		this.p2 = p2 || null;
 
 		this.rated = rated;
-		this.battle = Simulator.create(this.id, format, rated, this);
+		this.battle = new Rooms.RoomBattle(this, format, rated);
 		this.game = this.battle;
 
 		this.sideTicksLeft = [21, 21];
@@ -922,7 +980,7 @@ class BattleRoom extends Room {
 		if (Config.autosavereplays) {
 			let uploader = Users.get(winnerid);
 			if (uploader && uploader.connections[0]) {
-				CommandParser.parse('/savereplay', this, uploader, uploader.connections[0]);
+				Chat.parse('/savereplay', this, uploader, uploader.connections[0]);
 			}
 		}
 		if (this.tour) {
@@ -999,7 +1057,7 @@ class BattleRoom extends Room {
 		logData.timestamp = '' + date;
 		logData.id = this.id;
 		logData.format = this.format;
-		const logsubfolder = Tools.toTimeStamp(date).split(' ')[0];
+		const logsubfolder = Chat.toTimestamp(date).split(' ')[0];
 		const logfolder = logsubfolder.split('-', 2).join('-');
 
 		let curpath = 'logs/' + logfolder;
@@ -1337,7 +1395,7 @@ class ChatRoom extends Room {
 		if (Config.logchat) {
 			this.rollLogFile(true);
 			this.logEntry = function (entry, date) {
-				const timestamp = Tools.toTimeStamp(new Date()).split(' ')[1] + ' ';
+				const timestamp = Chat.toTimestamp(new Date()).split(' ')[1] + ' ';
 				entry = entry.replace(/<img[^>]* src="data:image\/png;base64,[^">]+"[^>]*>/g, '');
 				this.logFile.write(timestamp + entry + '\n');
 			};
@@ -1380,7 +1438,7 @@ class ChatRoom extends Room {
 		let date = new Date();
 		let basepath = 'logs/chat/' + this.id + '/';
 		mkdir(basepath, '0755', () => {
-			const dateString = Tools.toTimeStamp(date).split(' ')[0];
+			const dateString = Chat.toTimestamp(date).split(' ')[0];
 			let path = dateString.split('-', 2).join('-');
 			mkdir(basepath + path, '0755', () => {
 				if (this.destroyingLog) return;
@@ -1514,6 +1572,11 @@ class ChatRoom extends Room {
 				'Must be rank ' + this.modchat + ' or higher to talk right now.' +
 				'</div>';
 		}
+		if (this.slowchat && user.can('mute', null, this)) {
+			message += (message ? '<br />' : '\n|raw|<div class="infobox">') + '<div class="broadcast-red">' +
+				'Messages must have at least ' + this.slowchat + ' seconds between them.' +
+				'</div>';
+		}
 		if (message) message += '</div>';
 		return message;
 	}
@@ -1608,6 +1671,12 @@ class ChatRoom extends Room {
 		}
 		this.logUserStatsInterval = null;
 
+		if (!this.isPersonal) {
+			this.modlogStream.destroySoon();
+			this.modlogStream.removeAllListeners('finish');
+		}
+		this.modlogStream = null;
+
 		// get rid of some possibly-circular references
 		Rooms.rooms.delete(this.id);
 	}
@@ -1659,19 +1728,10 @@ Rooms.ChatRoom = ChatRoom;
 Rooms.RoomGame = require('./room-game').RoomGame;
 Rooms.RoomGamePlayer = require('./room-game').RoomGamePlayer;
 
-setTimeout(function () {
-	for (let room in Rooms.rooms) {
-		let curRoom = Rooms.rooms[room];
-		if (curRoom.type === 'chat' && !curRoom.protect && !curRoom.isOfficial && !curRoom.isPrivate && !curRoom.isPersonal && !curRoom.isStaff && curRoom.messageCount < 100) {
-			Rooms.global.deregisterChatRoom(curRoom.id);
-			curRoom.addRaw('<font color=red><b>This room has been automatically deleted due to inactivity.  It will be removed upon the next server restart.</b></font>');
-			if (curRoom.id !== 'global') curRoom.update();
-			curRoom.modchat = '~';
-			curRoom.isPrivate = 'hidden';
-			Rooms('staff').add("|raw|<font color=red><b>" + Tools.escapeHTML(curRoom.title) + " has been automatically deleted from the server due to inactivity.</b></font>").update();
-		}
-	}
-}, 5 * 24 * 60 * 60 * 1000);
+Rooms.RoomBattle = require('./room-battle').RoomBattle;
+Rooms.RoomBattlePlayer = require('./room-battle').RoomBattlePlayer;
+Rooms.SimulatorManager = require('./room-battle').SimulatorManager;
+Rooms.SimulatorProcess = require('./room-battle').SimulatorProcess;
 
 // initialize
 
@@ -1679,3 +1739,18 @@ if (!Config.quietconsole) console.log("NEW GLOBAL: global");
 Rooms.global = new GlobalRoom('global');
 
 Rooms.rooms.set('global', Rooms.global);
+
+
+/*setTimeout(function () {
+	for (let room in Rooms.rooms) {
+		let curRoom = Rooms.rooms[room];
+		if (curRoom.type === 'chat' && !curRoom.protect && !curRoom.isOfficial && !curRoom.isPrivate && !curRoom.isPersonal && !curRoom.isStaff && curRoom.messageCount < 50) {
+			Rooms.global.deregisterChatRoom(curRoom.id);
+			curRoom.addRaw('<font color=red><b>This room has been automatically deleted due to inactivity.  It will be removed upon the next server restart.</b></font>');
+			if (curRoom.id !== 'global') curRoom.update();
+			curRoom.modchat = '~';
+			curRoom.isPrivate = 'hidden';
+			Rooms('staff').add("|raw|<font color=red><b>" + Chat.escapeHTML(curRoom.title) + " has been automatically deleted from the server due to inactivity.</b></font>").update();
+		}
+	}
+}, 5 * 24 * 60 * 60 * 1000);*/

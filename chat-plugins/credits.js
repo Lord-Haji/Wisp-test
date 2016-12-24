@@ -121,7 +121,7 @@ exports.commands = {
 		if (amount < 1) return this.sendReply("/givecredits - You can't give less than one credits.");
 
 		Wisp.writeCredits(targetUser, amount);
-		this.sendReply(Tools.escapeHTML(targetUser) + " has received " + amount + ((amount === 1) ? " credits." : " credits."));
+		this.sendReply(Chat.escapeHTML(targetUser) + " has received " + amount + ((amount === 1) ? " credits." : " credits."));
 		logTransaction(user.name + " has given " + amount + ((amount === 1) ? " credit " : " credits ") + " to " + targetUser);
 		Rooms.get('marketplace').add('|html|<span style="color:red;">' + (user.name + " has given " + amount + ((amount === 1) ? " credit " : " credits ") + " to " + targetUser + ".</span>"));
 		if (Users.get(targetUser) && Users.get(targetUser).connected) {
@@ -147,7 +147,7 @@ exports.commands = {
 		if (amount < 1) return this.sendReply("/takecredits - You can't take less than one credit.");
 
 		Wisp.writeCredits(targetUser, -amount);
-		this.sendReply("You removed " + amount + ((amount === 1) ? " credit " : " credits ") + " from " + Tools.escapeHTML(targetUser));
+		this.sendReply("You removed " + amount + ((amount === 1) ? " credit " : " credits ") + " from " + Chat.escapeHTML(targetUser));
 		logTransaction(user.name + " has taken " + amount + ((amount === 1) ? " credit " : " credits ") + " from " + targetUser);
 		Rooms.get('marketplace').add('|html|<span style="color: red;">' + user.name + " has taken " + amount + ((amount === 1) ? " credit " : " credits ") + " from " + targetUser + ".</span>");
 		if (Users.get(targetUser) && Users.get(targetUser).connected) {
@@ -462,7 +462,7 @@ exports.commands = {
 						if (err) return console.log("credits4: " + err);
 						let averageCredits = rows[0]['AVG(credits)'];
 
-						this.sendReplyBox("The richest user is currently <b><font color=#24678d>" + Tools.escapeHTML(richestUser) + "</font></b> with <b><font color=#24678d>" +
+						this.sendReplyBox("The richest user is currently <b><font color=#24678d>" + Chat.escapeHTML(richestUser) + "</font></b> with <b><font color=#24678d>" +
 							richestUserCred + "</font></b> credits.</font></b><br />There is a total of <b><font color=#24678d>" +
 							userCount + "</font></b> users with at least one credits.<br /> The average user has " +
 							"<b><font color=#24678d>" + Math.round(averageCredits) + "</font></b> credits.<br /> There is a total of <b><font color=#24678d>" +
@@ -496,7 +496,7 @@ exports.commands = {
 				} else {
 					username = rows[u].userid;
 				}
-				output += '<tr><td>' + count + '</td><td>' + Tools.escapeHTML(username) + '</td><td>' + rows[u].credits + '</td></tr>';
+				output += '<tr><td>' + count + '</td><td>' + Chat.escapeHTML(username) + '</td><td>' + rows[u].credits + '</td></tr>';
 				count++;
 			}
 			self.sendReplyBox(output);

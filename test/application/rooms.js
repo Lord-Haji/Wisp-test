@@ -64,6 +64,7 @@ describe('Rooms features', function () {
 			const roomStaff = new User();
 			roomStaff.forceRename("Room auth", true);
 			const administrator = new User();
+			administrator.forceRename("Admin", true);
 			administrator.group = '~';
 			const options = {
 				rated: false,
@@ -78,9 +79,9 @@ describe('Rooms features', function () {
 			room = Rooms.global.startBattle(p1, p2, 'customgame', packedTeam, packedTeam, options);
 			administrator.joinRoom(room);
 			assert.strictEqual(room.getAuth(roomStaff), '%', 'before promotion attempt');
-			CommandParser.parse("/roomvoice Room auth", room, p1, p1.connections[0]);
+			Chat.parse("/roomvoice Room auth", room, p1, p1.connections[0]);
 			assert.strictEqual(room.getAuth(roomStaff), '%', 'after promotion attempt');
-			CommandParser.parse("/roomvoice Room auth", room, administrator, administrator.connections[0]);
+			Chat.parse("/roomvoice Room auth", room, administrator, administrator.connections[0]);
 			assert.strictEqual(room.getAuth(roomStaff), '+', 'after being promoted by an administrator');
 
 			for (const user of [roomStaff, administrator]) {

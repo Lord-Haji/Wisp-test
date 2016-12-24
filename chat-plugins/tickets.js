@@ -31,8 +31,8 @@ function addTicket(user, ticket) {
 	pendingTickets[id].status = 'Pending Staff';
 	pendingTickets[id].purchaseTime = moment().format('MMMM Do YYYY, h:mm A') + " EST";
 	save();
-	Wisp.messageSeniorStaff('/html A ticket has been purchased by ' + Wisp.nameColor(user, true) + '. ID: ' + id + ' Ticket: ' + Tools.escapeHTML(ticket));
-	Rooms('upperstaff').add('|raw|A ticket has been purchased by ' + Wisp.nameColor(user, true) + '. ID: ' + id + ' Ticket: ' + Tools.escapeHTML(ticket)).update();
+	Wisp.messageSeniorStaff('/html A ticket has been purchased by ' + Wisp.nameColor(user, true) + '. ID: ' + id + ' Ticket: ' + Chat.escapeHTML(ticket));
+	Rooms('upperstaff').add('|raw|A ticket has been purchased by ' + Wisp.nameColor(user, true) + '. ID: ' + id + ' Ticket: ' + Chat.escapeHTML(ticket)).update();
 }
 Wisp.addTicket = addTicket;
 
@@ -50,7 +50,7 @@ exports.commands = {
 				let ticket = pendingTickets[Object.keys(pendingTickets)[u]];
 				let date = ticket.purchaseTime;
 				output += '<tr><td>' + ticket.id + '</td><td>' + Wisp.nameColor(ticket.user, true) + '</td><td>' +
-					Tools.escapeHTML(ticket.type) + '</td><td>' + date + ' </td><td>' + (ticket.status === 'Pending Staff' ? '<font color=blue>Pending Staff</font>' : (~ticket.status.indexOf('Accepted by') ? '<font color=green>' + Tools.escapeHTML(ticket.status) + '</font>' : Tools.escapeHTML(ticket.status))) + '</td></tr>';
+					Chat.escapeHTML(ticket.type) + '</td><td>' + date + ' </td><td>' + (ticket.status === 'Pending Staff' ? '<font color=blue>Pending Staff</font>' : (~ticket.status.indexOf('Accepted by') ? '<font color=green>' + Chat.escapeHTML(ticket.status) + '</font>' : Chat.escapeHTML(ticket.status))) + '</td></tr>';
 			}
 			this.sendReply(output);
 		},

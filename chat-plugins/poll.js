@@ -69,7 +69,7 @@ class Poll {
 		this.options.forEach((option, number) => {
 			count++;
 			if (count === 1) output += "<tr>";
-			output += '<td class="poll-td"><button style="border-radius: 20px; transition-duration: 0.5s; transition-timing-function: linear;" value="/poll vote ' + number + '" name="send" title="Vote for ' + number + '. ' + Tools.escapeHTML(option.name) + '"' + (option.void ? ' disabled' : '') + '>' + Tools.escapeHTML(option.name) + '</button></td>';
+			output += '<td class="poll-td"><button style="border-radius: 20px; transition-duration: 0.5s; transition-timing-function: linear;" value="/poll vote ' + number + '" name="send" title="Vote for ' + number + '. ' + Chat.escapeHTML(option.name) + '"' + (option.void ? ' disabled' : '') + '>' + Chat.escapeHTML(option.name) + '</button></td>';
 			if (count >= 4) {
 				output += "</tr>";
 				count = 0;
@@ -95,7 +95,7 @@ class Poll {
 		while (!i.done) {
 			if (i.value[1].votes && i.value[1].votes !== 0) {
 				let percentage = Math.round((i.value[1].votes * 100) / (this.totalVotes || 1));
-				output += '<tr><td><strong>' + (i.value[0] === option ? '<em>' : '') + Tools.escapeHTML(i.value[1].name) + (i.value[0] === option ? '</em>' : '') + '</strong> <small>(' + i.value[1].votes + ' vote' + (i.value[1].votes === 1 ? '' : 's') + ')</small></td><td><span style="font-size: 7pt; background: ' + colors[c % 3] + '; padding-right: ' + (percentage * 3) + 'px; border-radius: 20px;"></span><small>&nbsp;' + percentage + '%</small></td></tr>';
+				output += '<tr><td><strong>' + (i.value[0] === option ? '<em>' : '') + Chat.escapeHTML(i.value[1].name) + (i.value[0] === option ? '</em>' : '') + '</strong> <small>(' + i.value[1].votes + ' vote' + (i.value[1].votes === 1 ? '' : 's') + ')</small></td><td><span style="font-size: 7pt; background: ' + colors[c % 3] + '; padding-right: ' + (percentage * 3) + 'px; border-radius: 20px;"></span><small>&nbsp;' + percentage + '%</small></td></tr>';
 			}
 			i = iter.next();
 			c++;
@@ -108,12 +108,12 @@ class Poll {
 
 	getQuestionMarkup() {
 		if (this.supportHTML) return this.question;
-		return Tools.escapeHTML(this.question);
+		return Chat.escapeHTML(this.question);
 	}
 
 	getOptionMarkup(option) {
 		if (this.supportHTML) return option.name;
-		return Tools.escapeHTML(option.name);
+		return Chat.escapeHTML(option.name);
 	}
 
 	update(force) {
@@ -223,7 +223,7 @@ exports.commands = {
 
 			if (!this.can('minigame', null, room)) return false;
 			if (supportHTML && !this.can('declare', null, room)) return false;
-			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+			if (!this.canTalk()) return;
 			if (room.poll) return this.errorReply("There is already a poll in progress in this room.");
 			if (params.length < 3) return this.errorReply("Not enough arguments for /poll new.");
 
@@ -396,7 +396,7 @@ exports.commands = {
 		stop: 'end',
 		end: function (target, room, user) {
 			if (!this.can('minigame', null, room)) return false;
-			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+			if (!this.canTalk()) return;
 			if (!room.poll) return this.errorReply("There is no poll running in this room.");
 			if (room.poll.timeout) clearTimeout(room.poll.timeout);
 
@@ -430,15 +430,17 @@ exports.commands = {
 			this.parse('/help poll');
 		},
 	},
-	pollhelp: ["/poll allows rooms to run their own polls. These polls are limited to one poll at a time per room.",
-				"Accepts the following commands:",
-				"/poll create [question], [option1], [option2], [...] - Creates a poll. Requires: % @ * # & ~",
-				"/poll htmlcreate [question], [option1], [option2], [...] - Creates a poll, with HTML allowed in the question and options. Requires: # & ~",
-				"/poll vote [number] - Votes for option [number].",
-				"/poll timer [minutes] - Sets the poll to automatically end after [minutes]. Requires: % @ * # & ~",
-				"/poll results - Shows the results of the poll without voting. NOTE: you can't go back and vote after using this.",
-				"/poll display - Displays the poll",
-				"/poll end - Ends a poll and displays the results. Requires: % @ # & ~"],
+	pollhelp: [
+		"/poll allows rooms to run their own polls. These polls are limited to one poll at a time per room.",
+		"Accepts the following commands:",
+		"/poll create [question], [option1], [option2], [...] - Creates a poll. Requires: % @ * # & ~",
+		"/poll htmlcreate [question], [option1], [option2], [...] - Creates a poll, with HTML allowed in the question and options. Requires: # & ~",
+		"/poll vote [number] - Votes for option [number].",
+		"/poll timer [minutes] - Sets the poll to automatically end after [minutes]. Requires: % @ * # & ~",
+		"/poll results - Shows the results of the poll without voting. NOTE: you can't go back and vote after using this.",
+		"/poll display - Displays the poll",
+		"/poll end - Ends a poll and displays the results. Requires: % @ # & ~",
+	],
 
 	pr: 'pollremind',
 	pollremind: function (target, room, user) {
@@ -455,5 +457,5 @@ exports.commands = {
 };
 
 process.nextTick(() => {
-	CommandParser.multiLinePattern.register('/poll (new|create|htmlcreate) ');
+	Chat.multiLinePattern.register('/poll (new|create|htmlcreate) ');
 });
