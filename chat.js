@@ -171,7 +171,7 @@ class CommandContext {
 				let buf = `|pm|${this.user.getIdentity()}|${this.pmTarget.getIdentity()}|${(emoticons ? '/html ' + emoticons : message)}`;
 				this.user.send(buf);
 				if (Users.ShadowBan.checkBanned(this.user)) {
-					Users.ShadowBan.addMessage(this.user, "To " + this.room.id, message);
+					Users.ShadowBan.addMessage(this.user, "(Private Message to " + this.pmTarget.name + ")", message);
 				} else if (this.pmTarget !== this.user) {
 					this.pmTarget.send(buf);
 				}
