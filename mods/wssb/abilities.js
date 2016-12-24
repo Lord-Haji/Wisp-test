@@ -453,14 +453,14 @@ exports.BattleAbilities = {
 				return this.chainModify([0x14CD, 0x1000]);
 			},
 		},
-		 onDamage: function (damage, target, source, effect) {
+		onDamage: function (damage, target, source, effect) {
 			if (effect.effectType !== 'Move') {
 				return false;
 			}
 		},
 		id: "comobreaker",
 		name: "combobreaker",
-	 },
+	},
 	//Emg TechP Volco
 	"volcanicash": {
 		isNonstandard: true,
@@ -685,7 +685,7 @@ exports.BattleAbilities = {
 		},
 		id: "sanic",
 		name: "Sanic",
-	 },
+	},
 	//Skyla (Full)
 	//Midnight Prof EXO // no longer staff
 	/*"twilightshield": {

@@ -818,9 +818,9 @@ exports.commands = {
 		}
 	},
 	titlehelp: ["/title set, user, title - Sets a title.",
-				"/title delete, user - Deletes a users title.",
-				"/title view, user - Shows a users title [broadcastable]",
-			],
+		"/title delete, user - Deletes a users title.",
+		"/title view, user - Shows a users title [broadcastable]",
+	],
 
 	advertise: function (target, room, user, connection) {
 		if (room.id !== 'lobby') return this.sendReply("This command only works in the lobby.");

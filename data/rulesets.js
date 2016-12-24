@@ -716,8 +716,8 @@ exports.BattleFormats = {
 				if (i === 0) {
 					typeTable = template.types;
 				} else {
-				typeTable = typeTable.filter(type => template.types.indexOf(type) >= 0);
-			}
+					typeTable = typeTable.filter(type => template.types.indexOf(type) >= 0);
+				}
 				let item = this.getItem(team[i].item);
 				if (item.megaStone && template.species === item.megaEvolves) {
 					template = this.getTemplate(item.megaStone);
