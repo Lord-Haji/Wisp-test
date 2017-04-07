@@ -1,6 +1,8 @@
 Pokémon Showdown
 ========================================================================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Lord-Haji/Wisp-test.svg)](https://greenkeeper.io/)
+
 Navigation: [Website][1] | **Server repository** | [Client repository][2] | [Dex repository][3]
 
   [1]: http://pokemonshowdown.com/
